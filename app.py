@@ -5,13 +5,13 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 import os
 import sqlite3 as sql
 import json
-import requests  # Add this import
+import requests
 
 app = Flask(__name__)
 
 DATABASE_FILE = "database.db"
 BUGGY_RACE_SERVER_URL = "https://rhul.buggyrace.net"
-API_KEY = "9B5135151EC1C57F"  # The API key provided
+API_KEY = "9B5135151EC1C57F"
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_FILE}'
 db = SQLAlchemy(app)
@@ -24,6 +24,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)  # New attribute for admin
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -77,33 +78,23 @@ def validate_buggy_data(data, options):
     
     return None
 
-#------------------------------------------------------------
-# Login Page
-#------------------------------------------------------------
 @app.route('/')
 def home():
-    con = sql.connect(DATABASE_FILE)
-    con.row_factory = sql.Row
-    cur = con.cursor()
-    cur.execute("SELECT id, flag_color FROM buggies")
-    buggies = cur.fetchall()
-    return render_template('login.html', server_url=BUGGY_RACE_SERVER_URL, buggies=buggies)
+    return redirect(url_for('login'))
 
-#------------------------------------------------------------
-# Index Page
-#------------------------------------------------------------
 @app.route('/index', methods=['GET'])
+@login_required
 def index():
     con = sql.connect(DATABASE_FILE)
     con.row_factory = sql.Row
     cur = con.cursor()
-    cur.execute("SELECT id, flag_color FROM buggies")
+    if current_user.is_admin:
+        cur.execute("SELECT * FROM buggies")
+    else:
+        cur.execute("SELECT * FROM buggies WHERE user_id = ?", (current_user.id,))
     buggies = cur.fetchall()
     return render_template('index.html', server_url=BUGGY_RACE_SERVER_URL, buggies=buggies)
 
-#------------------------------------------------------------
-# Login and Signup
-#------------------------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -130,7 +121,7 @@ def signup():
         return jsonify({"message": "User created"}), 201
     except Exception as e:
         db.session.rollback()
-        print(f"Error during signup: {str(e)}")  # Log the error to the console
+        print(f"Error during signup: {str(e)}")
         return jsonify({"message": f"Error: {str(e)}"}), 400
 
 @app.route('/logout')
@@ -139,12 +130,6 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-
-#------------------------------------------------------------
-# creating a new buggy:
-#  if it's a POST request process the submitted data
-#  but if it's a GET request, just show the form
-#------------------------------------------------------------
 @app.route('/new', methods=['POST', 'GET'])
 @login_required
 def create_buggy():
@@ -198,9 +183,6 @@ def create_buggy():
             con.close()
         return render_template("updated.html", msg=msg)
 
-#------------------------------------------------------------
-# updating an existing buggy
-#------------------------------------------------------------
 @app.route('/update/<int:buggy_id>', methods=['POST', 'GET'])
 @login_required
 def update_buggy(buggy_id):
@@ -208,9 +190,9 @@ def update_buggy(buggy_id):
         try:
             with sql.connect(DATABASE_FILE) as con:
                 cur = con.cursor()
-                cur.execute("SELECT * FROM buggies WHERE id = ? AND user_id = ?", (buggy_id, current_user.id))
+                cur.execute("SELECT * FROM buggies WHERE id = ?", (buggy_id,))
                 buggy = cur.fetchone()
-                if buggy is None:
+                if buggy is None or (buggy['user_id'] != current_user.id and not current_user.is_admin):
                     msg = f"No buggy found with ID {buggy_id} or you do not have permission to edit it"
                     return render_template("error.html", msg=msg)
                 
@@ -274,8 +256,8 @@ def update_buggy(buggy_id):
                 cur.execute(
                     """UPDATE buggies SET name=?, qty_wheels=?, flag_color=?, flag_color_secondary=?, flag_pattern=?, 
                     armour=?, power_type=?, power_units=?, attack=?, tyres=?, qty_tyres=?, total_cost=?, fireproof=?, insulated=?, antibiotic=?, banging=?, algo=? 
-                    WHERE id=? AND user_id=?""",
-                    (name, qty_wheels, flag_color, flag_color_secondary, flag_pattern, armour, power_type, power_units, attack, tyres, qty_tyres, total_cost, fireproof, insulated, antibiotic, banging, algo, buggy_id, current_user.id)
+                    WHERE id=? AND (user_id=? OR ?=1)""",
+                    (name, qty_wheels, flag_color, flag_color_secondary, flag_pattern, armour, power_type, power_units, attack, tyres, qty_tyres, total_cost, fireproof, insulated, antibiotic, banging, algo, buggy_id, current_user.id, current_user.is_admin)
                 )
                 con.commit()
                 msg = "Record successfully updated"
@@ -286,9 +268,6 @@ def update_buggy(buggy_id):
             con.close()
         return render_template("updated.html", msg=msg)
 
-#------------------------------------------------------------
-# a page for displaying the buggy
-#------------------------------------------------------------
 @app.route('/buggy/<int:buggy_id>')
 def show_buggy(buggy_id):
     con = sql.connect(DATABASE_FILE)
@@ -298,22 +277,19 @@ def show_buggy(buggy_id):
     record = cur.fetchone()
     return render_template("buggy.html", buggy=record)
 
-#------------------------------------------------------------
-# a page for selecting a buggy to edit
-#------------------------------------------------------------
 @app.route('/edit', methods=['GET'])
 @login_required
 def select_buggy_to_edit():
     con = sql.connect(DATABASE_FILE)
     con.row_factory = sql.Row
     cur = con.cursor()
-    cur.execute("SELECT id, name FROM buggies WHERE user_id = ?", (current_user.id,))
+    if current_user.is_admin:
+        cur.execute("SELECT id, name FROM buggies")
+    else:
+        cur.execute("SELECT id, name FROM buggies WHERE user_id = ?", (current_user.id,))
     buggies = cur.fetchall()
     return render_template('edit-select.html', buggies=buggies)
 
-#------------------------------------------------------------
-# a page for editing a specific buggy
-#------------------------------------------------------------
 @app.route('/edit/<int:buggy_id>', methods=['POST', 'GET'])
 @login_required
 def edit_buggy(buggy_id):
@@ -322,7 +298,7 @@ def edit_buggy(buggy_id):
             with sql.connect(DATABASE_FILE) as con:
                 con.row_factory = sql.Row
                 cur = con.cursor()
-                cur.execute("SELECT * FROM buggies WHERE id=? AND user_id=?", (buggy_id, current_user.id))
+                cur.execute("SELECT * FROM buggies WHERE id=? AND (user_id=? OR ?=1)", (buggy_id, current_user.id, current_user.is_admin))
                 buggy = cur.fetchone()
                 if buggy:
                     data = dict(buggy)
@@ -368,8 +344,8 @@ def edit_buggy(buggy_id):
                 cur = con.cursor()
                 cur.execute(
                     """UPDATE buggies SET name=?, qty_wheels=?, flag_color=?, flag_color_secondary=?, flag_pattern=?, 
-                    armour=?, power_type=?, power_units=?, attack=?, tyres=?, qty_tyres=?, total_cost=?, fireproof=?, insulated=?, antibiotic=?, banging=?, algo=? WHERE id=? AND user_id=?""",
-                    (name, qty_wheels, flag_color, flag_color_secondary, flag_pattern, armour, power_type, power_units, attack, tyres, qty_tyres, total_cost, fireproof, insulated, antibiotic, banging, algo, buggy_id, current_user.id)
+                    armour=?, power_type=?, power_units=?, attack=?, tyres=?, qty_tyres=?, total_cost=?, fireproof=?, insulated=?, antibiotic=?, banging=?, algo=? WHERE id=? AND (user_id=? OR ?=1)""",
+                    (name, qty_wheels, flag_color, flag_color_secondary, flag_pattern, armour, power_type, power_units, attack, tyres, qty_tyres, total_cost, fireproof, insulated, antibiotic, banging, algo, buggy_id, current_user.id, current_user.is_admin)
                 )
                 con.commit()
                 msg = "Record successfully updated"
@@ -380,27 +356,19 @@ def edit_buggy(buggy_id):
             con.close()
         return render_template("updated.html", msg=msg)
 
-#------------------------------------------------------------
-# Poster Page
-#------------------------------------------------------------
 @app.route('/poster', methods=['GET'])
 def poster():
     return render_template('poster.html')
 
-#------------------------------------------------------------
-# get JSON from current record
-#------------------------------------------------------------
 @app.route('/json-select')
 def json():
     return render_template('json-select.html')
 
 @app.route('/json/<string:buggy_id>')
 def summary(buggy_id):
-
     con = sql.connect(DATABASE_FILE)
     con.row_factory = sql.Row
     cur = con.cursor()
-    
     cur.execute("SELECT * FROM buggies WHERE id=? LIMIT 1", (buggy_id,))
     record = cur.fetchone()
     buggies = dict(zip([column[0] for column in cur.description], record)).items() 
@@ -416,7 +384,7 @@ def delete_buggy(buggy_id):
     try:
         with sql.connect(DATABASE_FILE) as con:
             cur = con.cursor()
-            cur.execute("DELETE FROM buggies WHERE id = ? AND user_id = ?", (buggy_id, current_user.id))
+            cur.execute("DELETE FROM buggies WHERE id = ? AND (user_id=? OR ?=1)", (buggy_id, current_user.id, current_user.is_admin))
             con.commit()
             msg = "Buggy successfully deleted"
     except Exception as e:
@@ -425,11 +393,6 @@ def delete_buggy(buggy_id):
     finally:
         con.close()
     return redirect(url_for('select_buggy_to_edit'))
-
-#------------------------------------------------------------
-# Submit Buggy JSON to Race Server
-#------------------------------------------------------------
-import json  # Ensure this is at the top of your file
 
 @app.route('/submit_buggy_json', methods=['POST'])
 @login_required
@@ -445,7 +408,7 @@ def submit_buggy_json():
         with sql.connect(DATABASE_FILE) as con:
             con.row_factory = sql.Row
             cur = con.cursor()
-            cur.execute("SELECT * FROM buggies WHERE id=? AND user_id=?", (buggy_id, current_user.id))
+            cur.execute("SELECT * FROM buggies WHERE id=? AND (user_id=? OR ?=1)", (buggy_id, current_user.id, current_user.is_admin))
             buggy = cur.fetchone()
             if buggy is None:
                 return jsonify({"message": "Buggy not found or you do not have permission to submit this buggy"}), 404
@@ -483,9 +446,6 @@ def submit_buggy_json():
         print(f"Error submitting Buggy JSON: {str(e)}")
         return jsonify({"message": f"Error submitting Buggy JSON: {str(e)}"}), 500
 
-#------------------------------------------------------------
-# API endpoint to get the buggy configuration
-#------------------------------------------------------------
 @app.route('/buggy-config/<int:buggy_id>', methods=['GET'])
 def get_buggy_config(buggy_id):
     try:
@@ -502,7 +462,6 @@ def get_buggy_config(buggy_id):
     except Exception as e:
         print(f"Error fetching buggy config: {str(e)}")
         return jsonify({"message": f"Error fetching buggy config: {str(e)}"}), 500
-
 
 if __name__ == '__main__':
     alloc_port = os.environ.get('CS1999_PORT') or 5102
