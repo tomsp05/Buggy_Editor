@@ -1,0 +1,642 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        font-family: Arial, sans-serif;
+    }
+
+    .form-container h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .form-container label {
+        display: block;
+        margin: 15px 0 5px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .form-container select,
+    .form-container input[type="number"],
+    .form-container input[type="color"],
+    .form-container input[type="submit"],
+    .form-container input[type="text"],
+    .form-container button[type="button"] {
+        width: calc(100% - 22px);
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    .form-container input[type="color"] {
+        height: 50px;
+        cursor: pointer;
+    }
+
+    .form-container input[type="submit"],
+    .form-container button[type="button"] {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .form-container input[type="submit"]:hover,
+    .form-container button[type="button"]:hover {
+        background-color: #45a049;
+    }
+
+    .home-button {
+        text-align: center;
+    }
+
+    .home-button a {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 5px;
+        background-color: #007BFF;
+        color: white;
+        text-decoration: none;
+        margin-top: 20px;
+    }
+
+    .home-button a:hover {
+        background-color: #0056b3;
+    }
+
+    .error-message {
+        color: red;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .total-cost {
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .option-group {
+        margin-bottom: 20px;
+        border-top: 1px solid #ddd;
+        padding-top: 20px;
+    }
+
+    .option-group h2 {
+        font-size: 20px;
+        color: #000;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .option-group h3 {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 5px;
+        font-weight: normal;
+    }
+
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted black;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 5px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%; /* Position the tooltip above the text */
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .flag-preview {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .buggy-preview {
+        text-align: center;
+        margin-top: 10px; /* Reduced space between title and drawing */
+    }
+
+    .submit-button {
+        display: block;
+        margin: 40px auto 0; /* Increased space between drawing and button */
+        padding: 10px 20px;
+        border-radius: 5px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .submit-button:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<div class="form-container">
+    <h1>Buggy Customiser</h1>
+
+    {% if msg %}
+    <p class="error-message">{{ msg }}</p>
+    {% endif %}
+
+    <button type="button" onclick="autoFill()">Auto-Fill</button>
+
+    <form id="buggy-form" action="{% if edit_mode and buggy_id %}{{ url_for('update_buggy', buggy_id=buggy_id) }}{% else %}{{ url_for('create_buggy') }}{% endif %}" method="post" onsubmit="return validateForm()">
+        
+        <input type="hidden" name="user_id" value="{{ current_user.id }}">
+
+        <div class="option-group">
+            <h2>Basic Options</h2>
+            <label for="name">Buggy Name:</label>
+            <input type="text" id="name" name="name" value="{{ name }}" required />
+            
+            <label for="qty_wheels">Number of wheels (must be even and >= 4):</label>
+            <input type="number" id="qty_wheels" name="qty_wheels" value="{{ qty_wheels }}" required min="4" step="2" />
+        </div>
+
+        <div class="option-group">
+            <h2>Flag Options</h2>
+            <h3>Colours</h3>
+            <label for="flag_color">Colour of Flag:</label>
+            <input type="color" id="flag_color" name="flag_color" value="{{ flag_color }}" required onchange="drawFlag()" />
+
+            <label for="flag_color_secondary">Secondary Colour of Flag:</label>
+            <input type="color" id="flag_color_secondary" name="flag_color_secondary" value="{{ flag_color_secondary }}" required onchange="drawFlag()" />
+
+            <h3>Pattern</h3>
+            <label for="flag_pattern">Pattern of Flag:</label>
+            <select id="flag_pattern" name="flag_pattern" onchange="drawFlag()">
+                {% for key, value in options.flag_pattern.items() %}
+                <option value="{{ key }}" {% if flag_pattern == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+
+            <div class="flag-preview">
+                <h3>Flag Preview</h3>
+                <canvas id="flagCanvas" width="200" height="100"></canvas>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h2>Defense and Attack Options</h2>
+            <h3>Defense</h3>
+            <label for="armour">Armour:</label>
+            <select id="armour" name="armour">
+                {% for key, value in options.armour.items() %}
+                <option value="{{ key }}" {% if armour == key %}selected{% endif %}>{{ key }} (Cost: {{ value.cost }})</option>
+                {% endfor %}
+            </select>
+
+            <h3>Attack</h3>
+            <label for="attack">Attack:</label>
+            <select id="attack" name="attack">
+                {% for key, value in options.attack.items() %}
+                <option value="{{ key }}" {% if attack == key %}selected{% endif %}>{{ key }} (Cost: {{ value.cost }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="option-group">
+            <h2>Power and Tyres Options</h3>
+            <h3>Power</h3>
+            <label for="power_type">Power Type (must not be none):</label>
+            <select id="power_type" name="power_type" required>
+                {% for key, value in options.power_type.items() %}
+                <option value="{{ key }}" {% if power_type == key %}selected{% endif %}>{{ key }} (Cost: {{ value.cost }})</option>
+                {% endfor %}
+            </select>
+
+            <label for="power_units">Number of Primary Power Units (>= 1):</label>
+            <input type="number" id="power_units" name="power_units" value="{{ power_units }}" required min="1" />
+
+            <h3>Tyres</h3>
+            <label for="tyres">Tyres:</label>
+            <select id="tyres" name="tyres">
+                {% for key, value in options.tyres.items() %}
+                <option value="{{ key }}" {% if tyres == key %}selected{% endif %}>{{ key }} (Cost: {{ value.cost }})</option>
+                {% endfor %}
+            </select>
+
+            <h3>Algorithm</h3>
+            <label for="algo">Algorithm:</label>
+            <select id="algo" name="algo">
+                {% for key, value in options.algo.items() %}
+                <option value="{{ key }}" {% if algo == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="qty_tyres">Number of Tyres (>= number of wheels):</label>
+            <input type="number" id="qty_tyres" name="qty_tyres" value="{{ qty_tyres }}" required min="4" />
+        </div>
+
+        <div class="option-group">
+            <h2>Special Options</h2>
+            <label for="fireproof">Fireproof:</label>
+            <input type="checkbox" id="fireproof" name="fireproof" value="true" {% if fireproof == 1 %}checked{% endif %} />
+
+            <label for="insulated">Insulated:</label>
+            <input type="checkbox" id="insulated" name="insulated" value="true" {% if insulated == 1 %}checked{% endif %} />
+
+            <label for="antibiotic">Antibiotic:</label>
+            <input type="checkbox" id="antibiotic" name="antibiotic" value="true" {% if antibiotic == 1 %}checked{% endif %} />
+
+            <label for="banging">Banging:</label>
+            <input type="checkbox" id="banging" name="banging" value="true" {% if banging == 1 %}checked{% endif %} />
+        </div>
+
+        <div class="total-cost">
+            Total Cost: <span id="total-cost">0</span>
+        </div>
+
+        <div class="buggy-preview">
+            <canvas id="buggyCanvas" width="800" height="150"></canvas>
+        </div>
+
+        <input type="submit" class="submit-button" value="Submit">
+
+        <div class="home-button">
+            <a href="/index">Home</a>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    const form = document.getElementById('buggy-form');
+    const costDisplay = document.getElementById('total-cost');
+    const options = {{ options | tojson }};
+    const editMode = {{ edit_mode | tojson }};
+    const flagCanvas = document.getElementById('flagCanvas');
+    const flagCtx = flagCanvas.getContext('2d');
+    const buggyCanvas = document.getElementById('buggyCanvas');
+    const buggyCtx = buggyCanvas.getContext('2d');
+
+    function calculateCost() {
+        let totalCost = 0;
+
+        const elements = ['armour', 'power_type', 'attack', 'tyres'];
+        elements.forEach(element => {
+            const value = form.elements[element].value;
+            totalCost += options[element][value].cost;
+        });
+
+        costDisplay.textContent = totalCost;
+    }
+
+    function validateForm() {
+        const qty_wheels = parseInt(document.getElementById('qty_wheels').value);
+        const qty_tyres = parseInt(document.getElementById('qty_tyres').value);
+        const power_type = document.getElementById('power_type').value;
+        const power_units = parseInt(document.getElementById('power_units').value);
+        const flag_color = document.getElementById('flag_color').value;
+        const flag_color_secondary = document.getElementById('flag_color_secondary').value;
+
+        if (qty_wheels < 4 || qty_wheels % 2 !== 0) {
+            alert("Number of wheels must be an even number and at least 4.");
+            return false;
+        }
+
+        if (qty_tyres < qty_wheels) {
+            alert("Number of tyres must be equal to or greater than the number of wheels.");
+            return false;
+        }
+
+        if (power_type === 'none') {
+            alert("Primary motive power must not be none.");
+            return false;
+        }
+
+        if (power_units < 1) {
+            alert("Number of primary motive power units must be at least 1.");
+            return false;
+        }
+
+        if (flag_color === flag_color_secondary) {
+            alert("Flag color and secondary color must be different.");
+            return false;
+        }
+
+        return true;
+    }
+
+    function drawFlag() {
+        const flagColor = document.getElementById('flag_color').value;
+        const flagColorSecondary = document.getElementById('flag_color_secondary').value;
+        const flagPattern = document.getElementById('flag_pattern').value;
+
+        flagCtx.clearRect(0, 0, flagCanvas.width, flagCanvas.height);
+
+        switch (flagPattern) {
+            case 'Check':
+                drawCheckPattern(flagColor, flagColorSecondary);
+                break;
+            case 'Dstripe':
+                drawDstripePattern(flagColor, flagColorSecondary);
+                break;
+            case 'Hstripe':
+                drawHstripePattern(flagColor, flagColorSecondary);
+                break;
+            case 'Plain':
+                drawPlainPattern(flagColor);
+                break;
+            case 'Spot':
+                drawSpotPattern(flagColor, flagColorSecondary);
+                break;
+            case 'Vstripe':
+                drawVstripePattern(flagColor, flagColorSecondary);
+                break;
+        }
+    }
+
+    function drawCheckPattern(color1, color2) {
+        const size = 20;
+        for (let y = 0; y < flagCanvas.height; y += size) {
+            for (let x = 0; x < flagCanvas.width; x += size) {
+                flagCtx.fillStyle = (x / size + y / size) % 2 === 0 ? color1 : color2;
+                flagCtx.fillRect(x, y, size, size);
+            }
+        }
+    }
+
+    function drawDstripePattern(color1, color2) {
+        const width = flagCanvas.width;
+        const height = flagCanvas.height;
+
+        flagCtx.fillStyle = color1;
+        flagCtx.beginPath();
+        flagCtx.moveTo(0, 0);
+        flagCtx.lineTo(width, 0);
+        flagCtx.lineTo(0, height);
+        flagCtx.closePath();
+        flagCtx.fill();
+
+        flagCtx.fillStyle = color2;
+        flagCtx.beginPath();
+        flagCtx.moveTo(width, 0);
+        flagCtx.lineTo(width, height);
+        flagCtx.lineTo(0, height);
+        flagCtx.closePath();
+        flagCtx.fill();
+    }
+
+    function drawHstripePattern(color1, color2) {
+        const height = flagCanvas.height / 2;
+        flagCtx.fillStyle = color1;
+        flagCtx.fillRect(0, 0, flagCanvas.width, height);
+        flagCtx.fillStyle = color2;
+        flagCtx.fillRect(0, height, flagCanvas.width, height);
+    }
+
+    function drawPlainPattern(color) {
+        flagCtx.fillStyle = color;
+        flagCtx.fillRect(0, 0, flagCanvas.width, flagCanvas.height);
+    }
+
+    function drawSpotPattern(color1, color2) {
+        flagCtx.fillStyle = color1;
+        flagCtx.fillRect(0, 0, flagCanvas.width, flagCanvas.height);
+        flagCtx.fillStyle = color2;
+        flagCtx.beginPath();
+        flagCtx.arc(flagCanvas.width / 2, flagCanvas.height / 2, flagCanvas.height / 4, 0, Math.PI * 2);
+        flagCtx.fill();
+    }
+
+    function drawVstripePattern(color1, color2) {
+        const width = flagCanvas.width / 2;
+        flagCtx.fillStyle = color1;
+        flagCtx.fillRect(0, 0, width, flagCanvas.height);
+        flagCtx.fillStyle = color2;
+        flagCtx.fillRect(width, 0, width, flagCanvas.height);
+    }
+
+    function drawBuggy() {
+        buggyCtx.clearRect(0, 0, buggyCanvas.width, buggyCanvas.height);
+        
+        const qty_wheels = parseInt(document.getElementById('qty_wheels').value);
+        const wheel_radius = 20;
+        const wheel_spacing = (buggyCanvas.width - (2 * wheel_radius)) / (qty_wheels - 1);
+
+        for (let i = 0; i < qty_wheels; i++) {
+            const x = wheel_radius + i * wheel_spacing;
+            const y = buggyCanvas.height - wheel_radius;
+            drawWheel(x, y, wheel_radius);
+        }
+        
+        const bodyHeight = 100;
+        const bodyTop = buggyCanvas.height - bodyHeight - (2 * wheel_radius);
+        drawFlagPattern(buggyCtx, wheel_radius, bodyTop, buggyCanvas.width - (2 * wheel_radius), bodyHeight);
+    }
+
+    function drawWheel(x, y, radius) {
+        buggyCtx.beginPath();
+        buggyCtx.arc(x, y, radius, 0, Math.PI * 2);
+        buggyCtx.fillStyle = '#333';
+        buggyCtx.fill();
+        buggyCtx.closePath();
+    }
+
+    function drawFlagPattern(ctx, x, y, width, height) {
+        const flagColor = document.getElementById('flag_color').value;
+        const flagColorSecondary = document.getElementById('flag_color_secondary').value;
+        const flagPattern = document.getElementById('flag_pattern').value;
+
+        ctx.clearRect(x, y, width, height);
+
+        switch (flagPattern) {
+            case 'Check':
+                drawCheckPatternOnBody(ctx, x, y, width, height, flagColor, flagColorSecondary);
+                break;
+            case 'Dstripe':
+                drawDstripePatternOnBody(ctx, x, y, width, height, flagColor, flagColorSecondary);
+                break;
+            case 'Hstripe':
+                drawHstripePatternOnBody(ctx, x, y, width, height, flagColor, flagColorSecondary);
+                break;
+            case 'Plain':
+                drawPlainPatternOnBody(ctx, x, y, width, height, flagColor);
+                break;
+            case 'Spot':
+                drawSpotPatternOnBody(ctx, x, y, width, height, flagColor, flagColorSecondary);
+                break;
+            case 'Vstripe':
+                drawVstripePatternOnBody(ctx, x, y, width, height, flagColor, flagColorSecondary);
+                break;
+        }
+    }
+
+    function drawCheckPatternOnBody(ctx, x, y, width, height, color1, color2) {
+        const size = 20;
+        for (let yPos = y; yPos < y + height; yPos += size) {
+            for (let xPos = x; xPos < x + width; xPos += size) {
+                ctx.fillStyle = ((xPos / size + yPos / size) % 2 === 0) ? color1 : color2;
+                ctx.fillRect(xPos, yPos, size, size);
+            }
+        }
+    }
+
+    function drawDstripePatternOnBody(ctx, x, y, width, height, color1, color2) {
+        const halfWidth = width / 2;
+        ctx.fillStyle = color1;
+        ctx.fillRect(x, y, halfWidth, height);
+        ctx.fillStyle = color2;
+        ctx.fillRect(x + halfWidth, y, halfWidth, height);
+    }
+
+    function drawHstripePatternOnBody(ctx, x, y, width, height, color1, color2) {
+        const halfHeight = height / 2;
+        ctx.fillStyle = color1;
+        ctx.fillRect(x, y, width, halfHeight);
+        ctx.fillStyle = color2;
+        ctx.fillRect(x, y + halfHeight, width, halfHeight);
+    }
+
+    function drawPlainPatternOnBody(ctx, x, y, width, height, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, width, height);
+    }
+
+    function drawSpotPatternOnBody(ctx, x, y, width, height, color1, color2) {
+        ctx.fillStyle = color1;
+        ctx.fillRect(x, y, width, height);
+        ctx.fillStyle = color2;
+        ctx.beginPath();
+        ctx.arc(x + width / 2, y + height / 2, height / 4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawVstripePatternOnBody(ctx, x, y, width, height, color1, color2) {
+        const halfWidth = width / 2;
+        ctx.fillStyle = color1;
+        ctx.fillRect(x, y, halfWidth, height);
+        ctx.fillStyle = color2;
+        ctx.fillRect(x + halfWidth, y, halfWidth, height);
+    }
+
+    async function autoFill() {
+        try {
+            const response = await fetch('/defaults');
+            const defaults = await response.json();
+
+            for (const key in defaults) {
+                if (defaults.hasOwnProperty(key)) {
+                    const element = form.elements[key];
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = defaults[key];
+                        } else if (element.type === 'color') {
+                            // Ensure color values start with '#' and are properly formatted
+                            let colorValue = defaults[key];
+                            if (!colorValue.startsWith('#')) {
+                                colorValue = '#' + colorValue;
+                            }
+                            console.log(`Setting color for ${key}: ${colorValue}`); // Debugging line
+                            element.value = colorValue;
+                        } else if (element.tagName === 'SELECT') {
+                            // Set the select element by finding an option that matches the default value
+                            const optionToSelect = Array.from(element.options).find(option => option.value.toLowerCase() === defaults[key].toLowerCase().replace(/\s+/g, ''));
+                            if (optionToSelect) {
+                                optionToSelect.selected = true;
+                            }
+                        } else {
+                            element.value = defaults[key];
+                        }
+                    }
+                }
+            }
+
+            calculateCost();
+            drawFlag();
+            drawBuggy();
+        } catch (error) {
+            console.error('Error fetching default values:', error);
+        }
+    }
+
+    async function loadBuggy(buggyId) {
+        if (!buggyId) return;
+
+        try {
+            const response = await fetch(`/buggy/${buggyId}`);
+            const buggy = await response.json();
+
+            for (const key in buggy) {
+                if (buggy.hasOwnProperty(key)) {
+                    const element = form.elements[key];
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = buggy[key];
+                        } else if (element.type === 'color') {
+                            // Ensure color values start with '#' and are properly formatted
+                            let colorValue = buggy[key];
+                            if (!colorValue.startsWith('#')) {
+                                colorValue = '#' + colorValue;
+                            }
+                            console.log(`Setting color for ${key}: ${colorValue}`); // Debugging line
+                            element.value = colorValue;
+                        } else if (element.tagName === 'SELECT') {
+                            // Set the select element by finding an option that matches the default value
+                            const optionToSelect = Array.from(element.options).find(option => option.value.toLowerCase() === buggy[key].toLowerCase().replace(/\s+/g, ''));
+                            if (optionToSelect) {
+                                optionToSelect.selected = true;
+                            }
+                        } else {
+                            element.value = buggy[key];
+                        }
+                    }
+                }
+            }
+
+            calculateCost();
+            drawFlag();
+            drawBuggy();
+        } catch (error) {
+            console.error('Error loading buggy data:', error);
+        }
+    }
+
+    form.addEventListener('change', () => {
+        calculateCost();
+        drawFlag();
+        drawBuggy();
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        calculateCost();
+        drawFlag();
+        drawBuggy();
+    });
+</script>
+
+{% endblock %}

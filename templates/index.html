@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        font-family: Arial, sans-serif;
+    }
+
+    .container h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .spacer {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .spacer .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        border-radius: 5px;
+        background-color: #007BFF;
+        color: white;
+        text-decoration: none;
+    }
+
+    .spacer .button:hover {
+        background-color: #0056b3;
+    }
+
+    .logout-button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        border-radius: 5px;
+        background-color: #dc3545;
+        color: white;
+        text-decoration: none;
+    }
+
+    .logout-button:hover {
+        background-color: #c82333;
+    }
+
+    p {
+        color: #333;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    p strong a {
+        color: #007BFF;
+        text-decoration: none;
+    }
+
+    p strong a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="container">
+    <h1>Buggy Editor</h1>
+
+    <div class="spacer">
+        <a href="/new" class="button">Make Buggy</a>
+        <a href="/edit" class="button">Saved Buggies</a>
+        <a href="/poster" class="button">View Poster</a>
+        <a href="/logout" class="logout-button">Logout</a>
+
+    </div>
+
+    <p>
+        Use this editor to specify a racing buggy. The editor saves it in its
+        little database and generates JSON data for the buggy. This is the data you
+        need to supply when you log into the
+        <strong><a href="{{ server_url }}">race server</a></strong>
+        and enter your buggy into the next race.
+    </p>
+    <p>
+        Remember that if your data is not accepted by the race server, your buggy
+        will be disqualified from that race... so make sure you program your editor
+        correctly.
+    </p>
+</div>
+
+{% endblock %}

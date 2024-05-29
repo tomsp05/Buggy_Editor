@@ -1,0 +1,230 @@
+{
+    "algo": {
+        "Buggy": {
+            "cost": 0,
+            "desc": "A bad state that occurs when damaged",
+            "mass": 0
+        },
+        "Defensive": {
+            "cost": 0,
+            "desc": "Always avoids conflict: will attack but only reluctantly",
+            "mass": 0
+        },
+        "Offensive": {
+            "cost": 0,
+            "desc": "Always seeks to attack (while attacks are available)",
+            "mass": 0
+        },
+        "Random": {
+            "cost": 0,
+            "desc": "Capriciously defensive, steady, or offensive at different times during the race, based on mood",
+            "mass": 0
+        },
+        "Steady": {
+            "cost": 0,
+            "desc": "The middle way: doesn't seek out attacks but makes them if opportunities present themselves",
+            "mass": 0
+        },
+        "Titfortat": {
+            "cost": 0,
+            "desc": "Starts steady, but petulantly switches to offence if attacked",
+            "mass": 0
+        }
+    },
+    "armour": {
+        "None": {
+            "cost": 0,
+            "desc": "Unburdened and unprotected. Ideal for trips to the shops",
+            "mass": 0
+        },
+        "Wood": {
+            "cost": 40,
+            "desc": "Cheap but pragmatic (sustainable forests are used where possible)",
+            "mass": 100
+        },
+        "Thinsteel": {
+            "cost": 100,
+            "desc": "Strong but heavy",
+            "mass": 200
+        },
+        "Aluminium": {
+            "cost": 200,
+            "desc": "Fairly strong but light",
+            "mass": 50
+        },
+        "Thicksteel": {
+            "cost": 200,
+            "desc": "Very strong but very heavy",
+            "mass": 400
+        },
+        "Titanium": {
+            "cost": 290,
+            "desc": "The ultimate in plate protection, but pricey",
+            "mass": 300
+        }
+    },
+    "attack": {
+        "None": {
+            "cost": 0,
+            "desc": "Mostly harmless",
+            "mass": 0
+        },
+        "Spike": {
+            "cost": 5,
+            "desc": "A metal prong welded onto the superstructure",
+            "mass": 10
+        },
+        "Flame": {
+            "cost": 20,
+            "desc": "A flamethrower that puffs out a ball of fire",
+            "mass": 12
+        },
+        "Charge": {
+            "cost": 28,
+            "desc": "An electric lance like a cattleprod made of lightning",
+            "mass": 25
+        },
+        "Biohazard": {
+            "cost": 30,
+            "desc": "A cloud of infectious spores that target homonids and rodents",
+            "mass": 10
+        }
+    },
+    "flag_pattern": {
+        "Check": {
+            "desc": "A chequered grid"
+        },
+        "Dstripe": {
+            "desc": "Diagonal stripes"
+        },
+        "Hstripe": {
+            "desc": "Horizontal stripes"
+        },
+        "Plain": {
+            "desc": "A plain field with no secondary colour"
+        },
+        "Spot": {
+            "desc": "Spotted"
+        },
+        "Vstripe": {
+            "desc": "Vertical stripes"
+        }
+    },
+    "power_type": {
+        "Hamster": {
+            "consum": true,
+            "cost": 3,
+            "desc": "Hamster",
+            "mass": 1
+        },
+        "Steam": {
+            "consum": true,
+            "cost": 3,
+            "desc": "Steam engine",
+            "mass": 4
+        },
+        "Petrol": {
+            "consum": true,
+            "cost": 4,
+            "desc": "Petroleum-fuelled internal combustion engine",
+            "mass": 2
+        },
+        "Bio": {
+            "consum": true,
+            "cost": 5,
+            "desc": "Bio-fuelled internal combustion engine",
+            "mass": 2
+        },
+        "Rocket": {
+            "consum": true,
+            "cost": 16,
+            "desc": "Rocket fuel",
+            "mass": 2
+        },
+        "Electric": {
+            "consum": true,
+            "cost": 20,
+            "desc": "Lithium-ion battery",
+            "mass": 20
+        },
+        "Wind": {
+            "consum": false,
+            "cost": 20,
+            "desc": "Sailing rig",
+            "mass": 30
+        },
+        "Solar": {
+            "consum": false,
+            "cost": 40,
+            "desc": "Bank of solar panels",
+            "mass": 30
+        },
+        "Thermo": {
+            "consum": false,
+            "cost": 300,
+            "desc": "Thermonuclear reactor",
+            "mass": 100
+        },
+        "Fusion": {
+            "consum": false,
+            "cost": 400,
+            "desc": "Fusion reactor",
+            "mass": 100
+        }
+    },
+    "special": {
+        "hamster_booster": {
+            "cost": 5,
+            "desc": "steroids for hamsters",
+            "mass": 1
+        },
+        "banging": {
+            "cost": 42,
+            "desc": "banging?",
+            "mass": 40
+        },
+        "fireproof": {
+            "cost": 70,
+            "desc": "fireproof?",
+            "mass": 8
+        },
+        "antibiotic": {
+            "cost": 90,
+            "desc": "antibiotic?",
+            "mass": 8
+        },
+        "insulated": {
+            "cost": 100,
+            "desc": "insulated?",
+            "mass": 20
+        }
+    },
+    "tyres": {
+        "Slick": {
+            "cost": 10,
+            "desc": "Fast choice for roads and rain",
+            "mass": 14
+        },
+        "Knobbly": {
+            "cost": 15,
+            "desc": "Great for off-roading",
+            "mass": 20
+        },
+        "Steelband": {
+            "cost": 20,
+            "desc": "Slower but almost impossible to puncture",
+            "mass": 28
+        },
+        "Reactive": {
+            "cost": 40,
+            "desc": "Intelligent nanotech swarm rubber restructures itself depending on the conditions",
+            "mass": 20
+        },
+        "Maglev": {
+            "cost": 50,
+            "desc": "You can't get punctures if you don't touch the ground. Frictionless.",
+            "mass": 30
+        }
+    }
+}
+

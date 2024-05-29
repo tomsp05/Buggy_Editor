@@ -1,0 +1,22 @@
+{
+    "name": "Default Buggy",
+    "algo": "steady",
+    "antibiotic": false,
+    "armour": "none",
+    "attack": "none",
+    "aux_power_type": "none",
+    "aux_power_units": 0,
+    "banging": false,
+    "fireproof": false,
+    "flag_color": "#ffffff",
+    "flag_color_secondary": "#000000",
+    "flag_pattern": "plain",
+    "hamster_booster": 0,
+    "insulated": false,
+    "power_type": "petrol",
+    "power_units": 1,
+    "qty_attacks": 0,
+    "qty_tyres": 4,
+    "qty_wheels": 4,
+    "tyres": "knobbly"
+}
