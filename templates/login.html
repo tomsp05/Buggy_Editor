@@ -113,6 +113,10 @@
                 <input type="email" id="signup-email" name="email" required>
             </div>
             <div class="form-group">
+                <label for="admin">Admin</label>
+                <input type="checkbox" id="admin" name="admin">
+            </div>
+            <div class="form-group">
                 <button onclick="signup()">Sign Up</button>
             </div>
             <div class="switch-link">
@@ -157,6 +161,7 @@
             const username = document.getElementById('signup-username').value;
             const password = document.getElementById('signup-password').value;
             const email = document.getElementById('signup-email').value;
+            const admin = document.getElementById('admin').checked;
 
             try {
                 const response = await fetch('/signup', {
@@ -164,7 +169,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username, password, email })
+                    body: JSON.stringify({ username, password, email, admin })
                 });
 
                 if (response.ok) {

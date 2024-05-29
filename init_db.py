@@ -60,25 +60,13 @@ if len(rows) == 0:
 else:
     print("Found a buggy in the database, nice")
 
-# Check if 'is_admin' column exists, and add it if it doesn't
 cursor.execute("PRAGMA table_info(users)")
 columns = [column[1] for column in cursor.fetchall()]
 if 'is_admin' not in columns:
     connection.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT false")
     print("Added 'is_admin' column to 'users' table")
 
-# Optionally, insert a default admin user
-cursor.execute("SELECT * FROM users WHERE username = 'admin'")
-rows = cursor.fetchall()
-if len(rows) == 0:
-    cursor.execute("""
-        INSERT INTO users (username, email, password, is_admin)
-        VALUES ('admin', 'admin@example.com', 'adminpassword', true)
-    """)
-    connection.commit()
-    print("Added default admin user")
-else:
-    print("Found an admin user in the database, nice")
+
 
 print("OK, your database is ready")
 connection.close()
