@@ -217,7 +217,6 @@ def create_buggy():
 @login_required
 def update_buggy(buggy_id):
     if request.method == 'GET':
-        render_template("error.html", msg=msg)
         try:
             buggy = Buggy.query.get(buggy_id)
             if buggy is None or (buggy.user_id != current_user.id and not current_user.is_admin):
@@ -323,46 +322,77 @@ def select_buggy_to_edit():
         buggies = Buggy.query.filter_by(user_id=current_user.id).all()
     return render_template('edit-select.html', buggies=buggies)
 
+
 @app.route('/edit/<int:buggy_id>', methods=['POST', 'GET'])
 @login_required
 def edit_buggy(buggy_id):
-    try:
-        buggy = Buggy.query.get(buggy_id)
-        if buggy is None:
-            flash("Buggy not found", "error")
-            return redirect(url_for('index'))
+    if request.method == 'GET':
+        try:
+            buggy = Buggy.query.get(buggy_id)
+            if buggy is None or (buggy.user_id != current_user.id and not current_user.is_admin):
+                msg = f"No buggy found with ID {buggy_id} or you do not have permission to edit it"
+                return render_template("error.html", msg=msg)
+                
+            buggy_data = {
+                'name': buggy.name,
+                'qty_wheels': buggy.qty_wheels,
+                'flag_color': buggy.flag_color,
+                'flag_color_secondary': buggy.flag_color_secondary,
+                'flag_pattern': buggy.flag_pattern,
+                'armour': buggy.armour,
+                'power_type': buggy.power_type,
+                'power_units': buggy.power_units,
+                'attack': buggy.attack,
+                'tyres': buggy.tyres,
+                'qty_tyres': buggy.qty_tyres,
+                'fireproof': buggy.fireproof,
+                'insulated': buggy.insulated,
+                'antibiotic': buggy.antibiotic,
+                'banging': buggy.banging,
+                'algo': buggy.algo,
+            }
+                
+            options = load_options()
+            return render_template("buggy-form.html", options=options, edit_mode=True, buggy_id=buggy_id, **buggy_data)
+        except Exception as e:
+            msg = f"Error loading buggy data: {str(e)}"
+            return render_template("error.html", msg=msg)
 
-        if request.method == 'GET':
-            return render_template("buggy-form.html", buggy=buggy, edit_mode=True)
+    elif request.method == 'POST':
+        data = request.form.to_dict()
+        msg = validate_buggy_data(data, load_options())
+        if msg:
+            options = load_options()
+            return render_template("buggy-form.html", msg=msg, options=options, edit_mode=True, buggy_id=buggy_id, **data)
+        
+        name = data['name']
+        qty_wheels = data['qty_wheels']
+        flag_color = data['flag_color']
+        flag_color_secondary = data['flag_color_secondary']
+        flag_pattern = data.get('flag_pattern', 'plain')
+        armour = data.get('armour', 'none')
+        power_type = data['power_type']
+        power_units = data['power_units']
+        attack = data.get('attack', 'none')
+        tyres = data['tyres']
+        qty_tyres = data['qty_tyres']
+        fireproof = 'fireproof' in data
+        insulated = 'insulated' in data
+        antibiotic = 'antibiotic' in data
+        banging = 'banging' in data
+        algo = data['algo']
 
-        elif request.method == 'POST':
-            data = request.form.to_dict()
-            msg = validate_buggy_data(data, load_options())
-            if msg:
-                options = load_options()
-                return render_template("buggy-form.html", msg=msg, options=options2, **data, edit_mode=True, buggy_id=buggy_id)
+        options = load_options()
+        total_cost = calculate_total_cost(
+            options, armour=armour, power_type=power_type, attack=attack, special='none', tyres=tyres
+        )
 
-            name = data['name']
-            qty_wheels = data['qty_wheels']
-            flag_color = data['flag_color']
-            flag_color_secondary = data['flag_color_secondary']
-            flag_pattern = data.get('flag_pattern', 'plain')
-            armour = data.get('armour', 'none')
-            power_type = data['power_type']
-            power_units = data['power_units']
-            attack = data.get('attack', 'none')
-            tyres = data['tyres']
-            qty_tyres = data['qty_tyres']
-            fireproof = 'fireproof' in data
-            insulated = 'insulated' in data
-            antibiotic = 'antibiotic' in data
-            banging = 'banging' in data
-            algo = data['algo']
-
-            total_cost = calculate_total_cost(
-                options, armour=armour, power_type=power_type, attack=attack, special='none', tyres=tyres
-            )
-
+        try:
+            buggy = Buggy.query.get(buggy_id)
+            if buggy.user_id != current_user.id and not current_user.is_admin:
+                msg = "You do not have permission to update this buggy"
+                return render_template("error.html", msg=msg)
+            
             buggy.name = name
             buggy.qty_wheels = qty_wheels
             buggy.flag_color = flag_color
@@ -381,17 +411,12 @@ def edit_buggy(buggy_id):
             buggy.algo = algo
             buggy.total_cost = total_cost
 
-            try:
-                db.session.commit()
-                flash("Record successfully updated", "success")
-                return redirect(url_for('index'))
-            except Exception as e:
-                db.session.rollback()
-                flash(f"Error in update operation: {str(e)}", "error")
-                return render_template("buggy-form.html", buggy=buggy, edit_mode=True)
-    except Exception as e:
-        flash(f"Error fetching buggy data: {str(e)}", "error")
-        return redirect(url_for('index'))
+            db.session.commit()
+            msg = "Record successfully updated"
+        except Exception as e:
+            db.session.rollback()
+            msg = f"Error in update operation: {str(e)}"
+        return render_template("updated.html", msg=msg)
 
 
 @app.route('/poster', methods=['GET'])
