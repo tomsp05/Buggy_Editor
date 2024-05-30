@@ -457,6 +457,7 @@ def delete_buggy(buggy_id):
 @app.route('/submit_buggy_json', methods=['POST'])
 @login_required
 def submit_buggy_json():
+    import json
     data = request.get_json()
     buggy_id = data.get('buggy_id')
     api_secret = data.get('api_secret')
