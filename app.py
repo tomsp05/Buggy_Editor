@@ -217,6 +217,7 @@ def create_buggy():
 @login_required
 def update_buggy(buggy_id):
     if request.method == 'GET':
+        render_template("error.html", msg=msg)
         try:
             buggy = Buggy.query.get(buggy_id)
             if buggy is None or (buggy.user_id != current_user.id and not current_user.is_admin):
@@ -361,8 +362,6 @@ def edit_buggy(buggy_id):
             total_cost = calculate_total_cost(
                 options, armour=armour, power_type=power_type, attack=attack, special='none', tyres=tyres
             )
-
-           
 
             buggy.name = name
             buggy.qty_wheels = qty_wheels
