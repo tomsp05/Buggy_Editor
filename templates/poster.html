@@ -525,7 +525,9 @@ function toggleContent(event) {
           To fix this, I changed the signup form logic to correctly store the state of the checkbox so when the form was submitted the correct value was stored in the database. Another issue was making sure that the edit and update routes correctly checked the user permissions when changing existing buggies. At first, the code didn't correctly restrict access, allowing standard users the ability to edit any buggy within the database. I fixed this by adding in more permission checks in both the `GET` and `POST` methods for the /edit route to make sure only the buggy owner or an admin user could edit. 
         </p>
         <p>
-          Once all of these changes were made and after testing the signup form along with the edit-select page multiple times through the VS code testing feature the admin user was able to be added and has full CRUD permissions across all buggies within the database.         </p>
+          Once all of these changes were made and after testing the signup form along with the edit-select page multiple times through the VS code testing feature the admin user was able to be added and has full CRUD permissions across all buggies within the database.         
+        </p>
+        <p> To finish off this task, because by project is running on gitLab for version control and I was working on a new branch to add the admin feature, I merged the admin_add branch to the main branch. </p>
       </div>
     </div>
     
