@@ -60,15 +60,13 @@ if len(rows) == 0:
 else:
     print("Found a buggy in the database, nice")
 
-connection.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username VARCHAR(150) UNIQUE NOT NULL,
-    email VARCHAR(150) UNIQUE NOT NULL,
-    password VARCHAR(150) NOT NULL
-)
-""")
-print("OK, table 'users' exists")
+cursor.execute("PRAGMA table_info(users)")
+columns = [column[1] for column in cursor.fetchall()]
+if 'is_admin' not in columns:
+    connection.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT false")
+    print("Added 'is_admin' column to 'users' table")
+
+
 
 print("OK, your database is ready")
 connection.close()

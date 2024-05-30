@@ -146,12 +146,12 @@
 
     .buggy-preview {
         text-align: center;
-        margin-top: 10px; /* Reduced space between title and drawing */
+        margin-top: 10px; 
     }
 
     .submit-button {
         display: block;
-        margin: 40px auto 0; /* Increased space between drawing and button */
+        margin: 40px auto 0; 
         padding: 10px 20px;
         border-radius: 5px;
         background-color: #4CAF50;
@@ -557,15 +557,13 @@
                         if (element.type === 'checkbox') {
                             element.checked = defaults[key];
                         } else if (element.type === 'color') {
-                            // Ensure color values start with '#' and are properly formatted
                             let colorValue = defaults[key];
                             if (!colorValue.startsWith('#')) {
                                 colorValue = '#' + colorValue;
                             }
-                            console.log(`Setting color for ${key}: ${colorValue}`); // Debugging line
+                            console.log(`Setting color for ${key}: ${colorValue}`); 
                             element.value = colorValue;
                         } else if (element.tagName === 'SELECT') {
-                            // Set the select element by finding an option that matches the default value
                             const optionToSelect = Array.from(element.options).find(option => option.value.toLowerCase() === defaults[key].toLowerCase().replace(/\s+/g, ''));
                             if (optionToSelect) {
                                 optionToSelect.selected = true;
@@ -599,15 +597,13 @@
                         if (element.type === 'checkbox') {
                             element.checked = buggy[key];
                         } else if (element.type === 'color') {
-                            // Ensure color values start with '#' and are properly formatted
                             let colorValue = buggy[key];
                             if (!colorValue.startsWith('#')) {
                                 colorValue = '#' + colorValue;
                             }
-                            console.log(`Setting color for ${key}: ${colorValue}`); // Debugging line
+                            console.log(`Setting color for ${key}: ${colorValue}`); 
                             element.value = colorValue;
                         } else if (element.tagName === 'SELECT') {
-                            // Set the select element by finding an option that matches the default value
                             const optionToSelect = Array.from(element.options).find(option => option.value.toLowerCase() === buggy[key].toLowerCase().replace(/\s+/g, ''));
                             if (optionToSelect) {
                                 optionToSelect.selected = true;
