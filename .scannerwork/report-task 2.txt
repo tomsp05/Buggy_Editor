@@ -1,0 +1,6 @@
+projectKey=buggy_editor
+serverUrl=http://localhost:9000
+serverVersion=10.5.1.90531
+dashboardUrl=http://localhost:9000/dashboard?id=buggy_editor
+ceTaskId=f1260e80-8d95-475a-9e0e-4063fc3e2a92
+ceTaskUrl=http://localhost:9000/api/ce/task?id=f1260e80-8d95-475a-9e0e-4063fc3e2a92

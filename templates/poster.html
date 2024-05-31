@@ -387,9 +387,7 @@ function toggleContent(event) {
         <p>
           Firstly, a new route was introduced in the `app.py` file to handle deleting buddies. The route, named `delete_buggy`, uses the HTTP POST method to remove a given buggy from the database based on its ID. The SQL command `DELETE FROM buggies WHERE id = ?` makes sure the correct buggy is deleted. Also, the `edit-select.html` template was updated to include a delete button next to each buggy entry. This button submits a form that calls the `delete_buggy` route, confirming the user's decision to delete the buggy. 
         </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
 
@@ -405,11 +403,23 @@ function toggleContent(event) {
         <p>The JavaScript code includes a drawFlag function that takes the colours inputted by the user and pattern and draws the flag on the canvas. Depending on the chosen pattern, different drawing functions are used, such as drawCheckPattern, drawDstripePattern, drawHstripePattern, drawPlainPattern, drawSpotPattern, and drawVstripePattern. These functions use the canvas's drawing area to create the patterns.</p>
 
         <p>I added event listeners to the form's colour and pattern inputs to call the drawFlag function whenever their values change. This makes that the flag preview is updated in real-time as the user makes their choices. The handler code also includes logic to manage the first drawing of the flag when the page loads and when the "Auto-Fill" button is used.      </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
+
+    <div class="task">
+      <h2 onclick="toggleContent(event)">3-TEST Write some tests <span class="arrow">▶</span></h2>
+      <div class="preview">
+        I added automated tests to the buggy application to ensure the of key functionalities worked as expected such...
+      </div>
+      <div class="content">
+        <p>
+          I added automated tests to the buggy application to ensure the of key functionalities worked as expected such as user authentication, buggy data validation, and cost calculation. At first, I wrote tests for creating and logging in users, as well as for the `calculate_total_cost` and `validate_buggy_data` functions. During testing, I experienced an issue with the nesting of client invocations, which caused a runtime error. To fix this problem, I removed unused context management within the test functions, as the test client fixture already gave the necessary context. Adding in automated tests using pytest makes testing the applications core processes easy to keep ontop of and leads to a more stable program.        </p>
+
+    
+      </div>
+    </div>
+
   </section>
   </div>
 
@@ -432,9 +442,7 @@ function toggleContent(event) {
         <p>
           During development of this phase there were a few issues. One issue was making sure that the form closed properly after the user submitted the form, whether successful or not. This was fixed by adding a finally block in the JavaScript submitBuggyJSON function to make sure the form always closes after the API call is complete. Another issue was keeping equal spacing between all action buttons (Edit, Submit JSON, Delete). This was fixed by using CSS flexbox properties, adding a button-container class with display: flex and gap: 10px to keep consistent spacing between all three buttons.
         </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+        
       </div>
     </div>
 
@@ -503,8 +511,9 @@ function toggleContent(event) {
         <p>
           To add the visual representation of the buggy into the form I used canvas elements and JavaScript to draw the buggy's design. The flag's pattern and colours were used to create the buggy's body, while the wheels were drawn below it. The image required making sure that the canvas properly showed the selected flag design, including the patterns picked by the user and making sure that the image updated in real-time as the user made changes.
         </p>
+        <img src="{{ url_for('static', filename='buggieVisual.png') }}" alt="Buggie Screenshot" width="1079" height="400" style="border-radius: 10px;">
+
         <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
         </p>
       </div>
     </div>
@@ -540,6 +549,7 @@ function toggleContent(event) {
         <p>
           At the minute, if a user forgets their password they have no choice other than to make a new account. This isn’t user friendly as it means the user won’t be able to access any of their buggies anymore because they are associated with their account that they lost. To fix this I added in a password reset system. First I added in a new page to view and manage users stored in the database, for security reasons I wanted to limit access of this page just to admin users. To add this, I created a new template called `usersView.html`, which lists all users in the system. To make sure only admins can view and interact with the page, I updated the view function in the app.py file. The function checks if the current user is an admin before fetching and displaying all users. If a non-admin user attempts to access this page, they are redirected to their respective view with limited permissions. Also, to further make sure standard users can’t access the page, the ‘View Users’ button only shows if the current user is an admin by checking the stored value in the ‘is_admin’ column.
         </p>
+        <img src="{{ url_for('static', filename='viewUsersScreen.png') }}" alt="Users Screenshot" width="1079" height="664" style="border-radius: 10px;">
         <p>
           To allow the administrator to reset user passwords I added in a new form block, using the same logic used in the signup form in the backend. I also added a delete button to allow unused users to be deleted from the database. 
         </p>
