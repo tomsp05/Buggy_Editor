@@ -38,7 +38,6 @@ CREATE TABLE buggies (
 """)
 print("OK, table 'buggies' exists")
 
-# Optionally, insert a default buggy if the table is empty
 cursor = connection.cursor()
 
 cursor.execute("SELECT * FROM buggies LIMIT 1")

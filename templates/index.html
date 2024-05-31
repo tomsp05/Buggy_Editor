@@ -77,8 +77,10 @@
         <a href="/new" class="button">Make Buggy</a>
         <a href="/edit" class="button">Saved Buggies</a>
         <a href="/poster" class="button">View Poster</a>
+        {% if current_user.is_admin%}
+            <a href="/users" class="button">View Users</a>
+        {% endif %}
         <a href="/logout" class="logout-button">Logout</a>
-
     </div>
 
     <p>

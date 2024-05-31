@@ -530,9 +530,55 @@ function toggleContent(event) {
         <p> To finish off this task, because by project is running on gitLab for version control and I was working on a new branch to add the admin feature, I merged the admin_add branch to the main branch. </p>
       </div>
     </div>
+
+    <div class="task">
+      <h2 onclick="toggleContent(event)">5-USR MANAGEMENT Add user management features  <span class="arrow">▶</span></h2>
+      <div class="preview">
+        At the minute, if a user forgets their password they have no choice other than to make a new account...
+      </div>
+      <div class="content">
+        <p>
+          At the minute, if a user forgets their password they have no choice other than to make a new account. This isn’t user friendly as it means the user won’t be able to access any of their buggies anymore because they are associated with their account that they lost. To fix this I added in a password reset system. First I added in a new page to view and manage users stored in the database, for security reasons I wanted to limit access of this page just to admin users. To add this, I created a new template called `usersView.html`, which lists all users in the system. To make sure only admins can view and interact with the page, I updated the view function in the app.py file. The function checks if the current user is an admin before fetching and displaying all users. If a non-admin user attempts to access this page, they are redirected to their respective view with limited permissions. Also, to further make sure standard users can’t access the page, the ‘View Users’ button only shows if the current user is an admin by checking the stored value in the ‘is_admin’ column.
+        </p>
+        <p>
+          To allow the administrator to reset user passwords I added in a new form block, using the same logic used in the signup form in the backend. I also added a delete button to allow unused users to be deleted from the database. 
+        </p>
+
+      </div>
+    </div>
     
   </section>
   </div>
+
+  <div class="phase">
+    <h2>Phase 6</h2>
+    <section class="poster-tasks">
+  
+      <div class="task">
+        <h2 onclick="toggleContent(event)">6-SONAR Use sonarQube to run an analysis of the code  <span class="arrow">▶</span></h2>
+        <div class="preview">
+          SonarQube is used for analysing code quality. It does automatic checks of code to detect bugs, vulnerabilities, and code smells...
+        </div>
+        <div class="content">
+          <p>SonarQube is used for analysing code quality. It does automatic checks of code to detect bugs, vulnerabilities, and code smells. To use this feature to ensure my code and web server are well written and don't have many vulnerabilities, I first installed a local instance of SonarQube. This was done by running the <code>sonar.sh</code> console command in the terminal. Then I ran these commands:</p>
+          <pre>
+          <code>
+          sonar-scanner \
+            -Dsonar.projectKey=buggy_editor \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=http://localhost:9000 \
+            -Dsonar.token=sqp_fcfd813187d80c8653a7ec52fdc90324dbf81eab
+          </code>
+          </pre>
+          <p>These commands configured the project and connected it to work with the local web server. Once this correctly ran (this required installing brew and node to allow the analysis to be run on the JavaScript within the HTML files), the analysis was outputted to the web server.</p>
+          <img src="{{ url_for('static', filename='analysis2.png') }}" alt="Analysis Screenshot" width="1079" height="664" style="border-radius: 10px;">
+
+
+        </div>
+      </div>
+      
+    </section>
+    </div>
 
 </div>
 

@@ -99,6 +99,34 @@ def validate_buggy_data(data, options):
     
     return None
 
+@app.route('/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    if not current_user.is_admin:
+        return redirect(url_for('viewUsers'))
+
+    user = User.query.get(user_id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+    return redirect(url_for('viewUsers'))
+
+@app.route('/reset_password/<int:user_id>', methods=['POST'])
+@login_required
+def reset_password(user_id):
+    if not current_user.is_admin:
+        return redirect(url_for('viewUsers'))
+
+    new_password = request.form['new_password']
+    hashed_password = generate_password_hash(new_password)
+    
+    user = User.query.get(user_id)
+    if user:
+        user.password = hashed_password
+        db.session.commit()
+    return redirect(url_for('viewUsers'))
+
+
 @app.route('/')
 def home():
     return redirect(url_for('login'))
@@ -426,6 +454,15 @@ def poster():
 @app.route('/json-select')
 def json():
     return render_template('json-select.html')
+
+@app.route('/users')
+@login_required
+def viewUsers():
+    if current_user.is_admin:
+        users = User.query.all() 
+    else:
+        users = User.query.filter_by(id=current_user.id).all()
+    return render_template('usersView.html', users=users)
 
 @app.route('/json/<string:buggy_id>')
 def summary(buggy_id):
