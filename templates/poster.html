@@ -416,7 +416,6 @@ function toggleContent(event) {
         <p>
           I added automated tests to the buggy application to ensure the of key functionalities worked as expected such as user authentication, buggy data validation, and cost calculation. At first, I wrote tests for creating and logging in users, as well as for the `calculate_total_cost` and `validate_buggy_data` functions. During testing, I experienced an issue with the nesting of client invocations, which caused a runtime error. To fix this problem, I removed unused context management within the test functions, as the test client fixture already gave the necessary context. Adding in automated tests using pytest makes testing the applications core processes easy to keep ontop of and leads to a more stable program.        </p>
 
-    
       </div>
     </div>
 
@@ -582,11 +581,23 @@ function toggleContent(event) {
           </pre>
           <p>These commands configured the project and connected it to work with the local web server. Once this correctly ran (this required installing brew and node to allow the analysis to be run on the JavaScript within the HTML files), the analysis was outputted to the web server.</p>
           <img src="{{ url_for('static', filename='analysis2.png') }}" alt="Analysis Screenshot" width="1079" height="664" style="border-radius: 10px;">
-
-
         </div>
       </div>
       
+      <div class="task">
+        <h2 onclick="toggleContent(event)">6-GIT Create a git repository for the project  <span class="arrow">▶</span></h2>
+        <div class="preview">
+          As part of the CS1998 course we learnt about using git for version control. Because of how useful version...
+        </div>
+        <div class="content">
+          <p>
+            As part of the CS1998 course we learnt about using git for version control. Because of how useful version control is during development I decided to use it for my buggy editor project. To do this I first created a new project within GitLab to serve as the web front for my git repository. Then I used the $git init command to turn the existing directory into a new git repository. Then using the $git config commands I linked the project in gitLab to the new repository. Then committed and pushed all of the current files and code to the gitLab project. From this point any changes made can be committed to the git repository and new branches can be made. This improves my workflow and allows me to roll back changes if they didn't work rather than painstakingly undoing all of the changes to get back to a working state. Also, when adding in new features, I now use a separate branch from the main branch and then once the new feature is working correctly I can merge the new branch to the main branch. 
+          </p>
+
+          <img src="{{ url_for('static', filename='GitImage.png') }}" alt="Git Screenshot" width="1079" height="764" style="border-radius: 10px;">
+        </div>
+      </div>
+
     </section>
     </div>
 
