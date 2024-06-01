@@ -95,6 +95,7 @@
             <div class="form-group">
                 <button onclick="login()">Login</button>
             </div>
+
             <div class="switch-link">
                 <p>Don't have an account? <a href="#" onclick="showSignupForm()">Create an account</a></p>
             </div>
@@ -141,7 +142,7 @@
         async function login() {
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
-e
+
             const response = await fetch('/login', {
                 method: 'POST',
                 headers: {
@@ -149,7 +150,6 @@ e
                 },
                 body: JSON.stringify({ username, password })
             });
-
             if (response.ok) {
                 window.location.href = '/index'; 
             } else {
