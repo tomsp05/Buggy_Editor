@@ -158,7 +158,6 @@ function toggleContent(event) {
           First I downloaded the latest version of Python3 from the python installer. Then, to check that it was installed correctly on my device I checked the current python version in terminal using the "python --version" command. Then, because I already had Visual Studio code installed, I opened Visual Studio and tested that python files worked. Once python was correctly installed and tested I downloaded the .zip file for the source code and unzipped the downloaded file. Opened this folder up in Visual Studio and completed the task.
         </p>
         <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
         </p>
       </div>
     </div>
@@ -172,9 +171,6 @@ function toggleContent(event) {
         <p>
           First I Installed the library dependencies by running 'pip3 install -r requirements.txt' in the Visual Studio terminal. Then I setup the SQL database for the buggy editor app by running 'python3 init_db.py'. It was recommended to run in Flask's development environment so any changes made to the code would immediately be reflected on the web browser. In the terminal I ran 'export FLASK_ENV=development' to initialise the development environment. Then I ran the Buggy Editor using 'python3 app.py' in the Visual Studio terminal. The buggy editor was meant to run as a webserver on port 5000 but an error was given stating that the port was already in use on my device. To fix this, rather than stop the operation currently using port 5000 I changed the app.py to run on port 5100. After I did this I opened up http://127.0.0.1:5100/ and the Buggy Editor was displayed.
         </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
       </div>
     </div>
 
@@ -186,9 +182,6 @@ function toggleContent(event) {
       <div class="content">
         <p>
           To test changing the website I navigated to the 'index.html' file within the 'templates' file. Simply changed the header from "My buggy editor" to "Buggy Editor". This change was updated on the webserver in the browser.
-        </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
         </p>
       </div>
     </div>
@@ -208,9 +201,7 @@ function toggleContent(event) {
         <p>
           First i created a new template in the templates folder by duplicating an existing template. Then I created a new route for the info page. Once this was done I ran the webserver and tested the url 'http://127.0.0.1:5100/info' which displayed the new template that I had created.
         </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
 
@@ -227,9 +218,7 @@ function toggleContent(event) {
           To update the database correctly with both the number of wheels and the flag colour I updated the post method in the /new route within the app.py file. I added in the flag_color variable and set it to the inputted value from the form, then updated the buggies database accordingly by using this SQL command: UPDATE buggies set qty_wheels=?,flag_color=? WHERE id=?
           
           Then, I wanted to include the options from the JSON file in the form to allow users to select their preferred configurations for the buggy. This is done by loading the options from the JSON file on the server side and passing them to the HTML template. The benefits of using a .JSON file rather than hardcoding the options into the. In the form, i created dropdown menus for each category of options, such as armour and power type. Each dropdown menu contains with the choices from the JSON file, letting users to easily select the options they want. When the user submits the form, the selected options are saved and sent to the server. The server then processes these selections, making they are included in the database update. Alongside the other details like the number of wheels and flag colour, the selected options are stored in the database by using the same method as outlined before.      </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
 
@@ -244,9 +233,7 @@ function toggleContent(event) {
           {{ msg }}
           
           {% endif %} Then, as extra validation, I added in error handling to the database operations. This is to catch any exception that happens during the database operations, the transaction is reversed and an error message is set that details the exception. except Exception as e: con.rollback() msg = f"Error in update operation: {str(e)}"      </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
 
@@ -265,9 +252,7 @@ function toggleContent(event) {
 
           Finally, rather than just updating the styling of the buggy editor page i decided to follow these style choices through to the index page (serves as the homepage for the webpage). To do this i used similar CSS on the index.html template.
         </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
   </section>
@@ -287,9 +272,7 @@ function toggleContent(event) {
           First, I updated the edit_buggy function in the app.py file to get the current settings of the buggy from the database using an SQL SELECT query. The function gets the values stored in the database for the current buggy (as there is only one buggy in the database it gets the values in the only row, then passes these values to the buggy-form.html template. If no record is found the default values are used. In the buggy-form.html template, then I updated the form fields to use the passed values, making sure the form is pre-filled with the current settings by using logic within the label and input tags, for example this is the input tag for the 'fireproof' option: input type="checkbox" id="fireproof" name="fireproof" value="true" {% if fireproof == 1 %}checked{% endif %}
 
           Then, to make sure the user was actually able to edit the buggy, I added a button in the index.html template to route the user to the edit.html template rather than relying on them typing the full edit url into the url bar.       </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
 
@@ -302,9 +285,7 @@ function toggleContent(event) {
         <p>
           The total cost of the buggy is calculated dynamically while the user is creating their buggy. This is done through a JavaScript function that updates the cost whenever the user changes any options. The form includes options for armour and power type, all of which have an associated cost. The JavaScript function sums the costs of the selected armour and power type and displays the total cost in real-time on the form. When the user submits the form, the server calculates the total cost again using the same logic to ensure accuracy. This total cost is then saved to the database along with the other buggy details, making sure that the saved record accurately reflects the user's selected configuration and its cost.
         </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
 
@@ -318,9 +299,7 @@ function toggleContent(event) {
           To make sure the game rules are properly followed, I added validation logic to the buggy editor. The validate_buggy_data function was made to check user inputs against the game rules. This function verifies that the number of wheels is an even number and at least four, that the number of tyres is equal to or greater than the number of wheels, that the primary motive power is not set to 'none', and that the flag's primary and secondary colours are different. In addition to validation, the app.py file was updated to handle form data correctly. Boolean fields such as fireproof, insulated, antibiotic, and banging were added with proper handling to check their presence in the form submission. The SQL query was corrected to include all relevant fields, making sure that the data is saved to the database correctly. 
 
           The validation is completed as the user submits the buggy create/edit form via a function called validateForm(). If the inputted data doesn't comply with the game rules an alert is given to the user to explain what is wrong and what they need to do to change it. Rather than just saying that something is wrong and leaving it up to the user to figure out what, the webpage explains which part of the form needs updating.       </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
   </section>
@@ -338,9 +317,7 @@ function toggleContent(event) {
       <div class="content">
         <p>
           I first did some research to understand what the difference between different environments was and why they were needed. After i understood the difference between a debug and production environment I used the command 'FLASK_ENV=production' in the terminal to change the working environment to a production environment from the development one. While in the production environment the changes made to the code weren't updated live on the webpage. To change back to the development environment I removed this command from the current working library command.       </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
 
@@ -354,9 +331,7 @@ function toggleContent(event) {
           The auto-fill feature was added to the buggy editor to improve the user experience by automatically filling form fields with default values. First, a new route was created in app.py to get the default values from a JSON file (defaults.json) containing the default values for the buggy. The HTML form (buggy-form.html) was then updated to include an "Auto-Fill" button, which triggers a JavaScript function to get and set these default values.
 
           The JavaScript function autoFill was made to handle various input types, including checkboxes, colour inputs, and dropdown menus. First attempts had issues with correctly setting colour inputs and dropdown selections. To resolve this, the function was changed to make sure colour values were formatted correctly and to take into account the case and whitespace differences in the dropdown values.       </p>
-        <p>
-          <!-- sentence(s) on anything interesting/incomplete you did -->
-        </p>
+
       </div>
     </div>
 

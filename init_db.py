@@ -5,7 +5,6 @@ DATABASE_FILE = 'database.db'
 connection = sqlite3.connect(DATABASE_FILE)
 print(f"Opened database successfully in file {DATABASE_FILE}")
 
-# Drop the existing 'buggies' table (if it exists) and create a new one with the updated schema
 connection.execute("DROP TABLE IF EXISTS buggies")
 connection.execute("""
 CREATE TABLE buggies (
